@@ -6,6 +6,9 @@
   <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
   <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.js'></script>
   <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.css' rel='stylesheet' />
+  <link href='https://api.mapbox.com/mapbox-assembly/v0.23.1/assembly.min.css' rel='stylesheet'>
+  <script async defer src='https://api.mapbox.com/mapbox-assembly/v0.23.1/assembly.js'></script>
+
   <style>
     body { margin:0; padding:0; }
     #map { position:absolute; top:0; bottom:0; width:100%; }
@@ -58,12 +61,12 @@ map.on('load', function () {
 
   map.on('click', 'sensor-layer', function (e) {
     const txt = Object.keys(e.features[0].properties).map(prop => {
-      return `<tr><td>${prop}</td><td>${e.features[0].properties[prop]}</td></tr>`;
+      return `<tr><td>${prop}</td><td class="align-r">${e.features[0].properties[prop]}</td></tr>`;
     }).join('');
 
     new mapboxgl.Popup()
       .setLngLat(e.lngLat)
-      .setHTML(`<table>${txt}</table>`)
+      .setHTML(`<table class="table txt-xs">${txt}</table>`)
       .addTo(map);
   });
 });
