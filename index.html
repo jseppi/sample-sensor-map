@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset='utf-8' />
+  <title>Sample Sensor Data Map</title>
+  <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+  <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.js'></script>
+  <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.49.0/mapbox-gl.css' rel='stylesheet' />
+  <style>
+    body { margin:0; padding:0; }
+    #map { position:absolute; top:0; bottom:0; width:100%; }
+  </style>
+</head>
+<body>
+
+<div id='map'></div>
+<script>
+mapboxgl.accessToken = 'pk.eyJ1IjoianNlcHBpbWJ4IiwiYSI6ImNqbGU1ODdtMzBpZjUzcG1pMWJnaHB2aHgifQ.xGVwKUpyJ-S5iyaLq7GFLA';
+const map = new mapboxgl.Map({
+  container: 'map',
+  style: 'mapbox://styles/mapbox/dark-v9',
+  center: [-122.669732, 45.540429],
+  zoom: 17.5
+});
+
+const rampColors = ['#ffffb2','#fecc5c','#fd8d3c','#f03b20','#bd0026'];
+const breaks = [-597, 1169, 2935, 4701, 6467];
+
+const colorStops = [];
+breaks.forEach((val, idx) => {
+  colorStops.push(val, rampColors[idx]);
+});
+
+map.on('load', function () {
+  map.addLayer({
+    'id': 'sensor-layer',
+    'type': 'circle',
+    'source': {
+      type: 'vector',
+      url: 'mapbox://jseppimbx.cjo7r57i70m0p2wp4r5gw16ik-4enn4'
+    },
+    'source-layer': 'Sample_Sensor_Data',
+    'paint': {
+      // make circles larger as the user zooms from z12 to z22
+      'circle-radius': {
+        'base': 1.75,
+        'stops': [[12, 2], [22, 30]]
+      },
+      // color circles by IR BCc, using a match expression
+      // https://www.mapbox.com/mapbox-gl-js/style-spec/#expressions-match
+      'circle-color': [
+        'interpolate',
+        ['linear'],
+        ['get', 'IR BCc'],
+      ].concat(colorStops)
+    }
+  });
+
+  map.on('click', 'sensor-layer', function (e) {
+    const txt = Object.keys(e.features[0].properties).map(prop => {
+      return `<tr><td>${prop}</td><td>${e.features[0].properties[prop]}</td></tr>`;
+    }).join('');
+
+    new mapboxgl.Popup()
+      .setLngLat(e.lngLat)
+      .setHTML(`<table>${txt}</table>`)
+      .addTo(map);
+  });
+});
+</script>
+
+</body>
+</html>
